@@ -1,26 +1,26 @@
-FROM node:lts-buster
+# Utiliser une version Debian stable encore supportée
+FROM node:lts-bullseye
 
-# Correction des sources et installation sécurisée des paquets
-RUN sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list && \
-    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
-    apt-get update || true && \
-    apt-get -o Acquire::Check-Valid-Until=false update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ffmpeg \
-        imagemagick \
-        webp \
-        libwebp-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Mise à jour et installation des dépendances système
+RUN apt-get update && \
+  apt-get install -y ffmpeg imagemagick webp && \
+  apt-get upgrade -y && \
+  rm -rf /var/lib/apt/lists/*
 
+# Définir le répertoire de travail
 WORKDIR /usr/src/app
 
+# Copier le fichier de dépendances et installer
 COPY package.json .
 
+# Installer les dépendances Node.js (incluant qrcode-terminal et pm2)
 RUN npm install && npm install -g qrcode-terminal pm2
 
+# Copier le reste du code source
 COPY . .
 
+# Exposer le port utilisé par ton app
 EXPOSE 5000
 
+# Lancer l'application
 CMD ["npm", "start"]
