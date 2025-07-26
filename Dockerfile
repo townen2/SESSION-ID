@@ -20,7 +20,7 @@ RUN npm install && npm install -g qrcode-terminal pm2
 COPY . .
 
 # Exposer le port utilisé par ton app
-EXPOSE 5000
+EXPOSE 8000
 
 # Lancer l'application
 CMD ["npm", "start"]
